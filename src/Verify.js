@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import axios from 'axios'
 
+const API = 'http://127.0.0.1:8000'
+
 function Verify() {
   const [image, setImage] = useState(null)
   const [message, setMessage] = useState('')
@@ -10,106 +12,62 @@ function Verify() {
   const handleVerify = async () => {
     if (!image) {
       setMessage('Please select an image')
+      setSuccess(false)
       return
     }
-
     setLoading(true)
     setMessage('')
-
     const formData = new FormData()
     formData.append('image', image)
-
     try {
-      const response = await axios.post('http://127.0.0.1:8000/verify', formData)
-      setSuccess(response.data.success)
-      setMessage(response.data.message)
-    } catch (error) {
+      const res = await axios.post(`${API}/verify`, formData)
+      setSuccess(res.data.success)
+      setMessage(res.data.message)
+    } catch {
       setMessage('Error connecting to API')
       setSuccess(false)
     }
-
     setLoading(false)
   }
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h2 style={styles.title}>Verify Voter</h2>
+    <div className="page">
+      <div className="page-header">
+        <h1 className="page-title">Verify Voter</h1>
+        <p className="page-subtitle">Check if a face is registered in the system</p>
+      </div>
 
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setImage(e.target.files[0])}
-          style={styles.input}
-        />
+      <div className="card" style={{ maxWidth: '480px' }}>
+        <div className="form-group">
+          <label className="form-label">Face Photo</label>
+          <label className="file-input-wrapper">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={e => setImage(e.target.files[0])}
+            />
+            <span style={{ fontSize: '28px' }}>🔍</span>
+            <p className="file-input-text">Click to upload a photo to verify</p>
+            {image && <p className="file-selected">✓ {image.name}</p>}
+          </label>
+        </div>
 
         <button
+          className="btn btn-primary"
           onClick={handleVerify}
-          style={styles.button}
           disabled={loading}
         >
-          {loading ? 'Verifying...' : 'Verify'}
+          {loading ? 'Verifying...' : 'Verify Face'}
         </button>
 
         {message && (
-          <div style={{
-            ...styles.resultBox,
-            backgroundColor: success ? '#d4edda' : '#f8d7da',
-            borderColor: success ? '#28a745' : '#dc3545',
-          }}>
-            <p style={{ color: success ? '#28a745' : '#dc3545', margin: 0, fontWeight: 'bold' }}>
-              {message}
-            </p>
+          <div className={`alert ${success ? 'alert-success' : 'alert-danger'}`}>
+            {success ? '✅ ' : '❌ '}{message}
           </div>
         )}
       </div>
     </div>
   )
-}
-
-const styles = {
-  container: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: '50px',
-  },
-  card: {
-    backgroundColor: 'white',
-    padding: '40px',
-    borderRadius: '10px',
-    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-    width: '400px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '15px',
-  },
-  title: {
-    textAlign: 'center',
-    color: '#1a1a2e',
-    marginBottom: '10px',
-  },
-  input: {
-    padding: '12px',
-    borderRadius: '6px',
-    border: '1px solid #ddd',
-    fontSize: '16px',
-  },
-  button: {
-    padding: '12px',
-    backgroundColor: '#1a1a2e',
-    color: 'white',
-    border: 'none',
-    borderRadius: '6px',
-    fontSize: '16px',
-    cursor: 'pointer',
-  },
-  resultBox: {
-    padding: '15px',
-    borderRadius: '6px',
-    border: '1px solid',
-    textAlign: 'center',
-  }
 }
 
 export default Verify

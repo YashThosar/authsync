@@ -1,93 +1,51 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 
+const API = 'http://127.0.0.1:8000'
+
 function Voters() {
   const [voters, setVoters] = useState([])
   const [total, setTotal] = useState(0)
 
   useEffect(() => {
-    axios.get('http://127.0.0.1:8000/voters')
-      .then(response => {
-        setVoters(response.data.voters)
-        setTotal(response.data.total)
+    axios.get(`${API}/voters`)
+      .then(res => {
+        setVoters(res.data.voters)
+        setTotal(res.data.total)
       })
-      .catch(error => console.error('Error fetching voters:', error))
+      .catch(err => console.error('Error fetching voters'))
   }, [])
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h2 style={styles.title}>Registered Voters</h2>
-        <p style={styles.total}>Total: {total}</p>
+    <div className="page">
+      <div className="page-header">
+        <h1 className="page-title">Registered Voters</h1>
+        <p className="page-subtitle">{total} voter{total !== 1 ? 's' : ''} registered in the system</p>
+      </div>
 
-        {voters.map((voter, index) => (
-          <div key={index} style={styles.voterCard}>
-            <span style={styles.index}>{index + 1}</span>
-            <span style={styles.name}>{voter.name}</span>
+      <div className="card">
+        {voters.length === 0 ? (
+          <div className="empty-state">
+            <div className="empty-icon">👥</div>
+            <p className="empty-text">No voters registered yet</p>
           </div>
-        ))}
-
-        {voters.length === 0 && (
-          <p style={styles.empty}>No voters registered yet</p>
+        ) : (
+          <div className="voter-list">
+            {voters.map((voter, index) => (
+              <div key={index} className="voter-item">
+                <span className="voter-number">#{String(index + 1).padStart(2, '0')}</span>
+                <div className="voter-avatar">
+                  {voter.name.charAt(0).toUpperCase()}
+                </div>
+                <span className="voter-name">{voter.name}</span>
+                <span className="voter-badge">Registered</span>
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </div>
   )
-}
-
-const styles = {
-  container: {
-    display: 'flex',
-    justifyContent: 'center',
-    padding: '50px',
-  },
-  card: {
-    backgroundColor: 'white',
-    padding: '40px',
-    borderRadius: '10px',
-    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-    width: '500px',
-  },
-  title: {
-    textAlign: 'center',
-    color: '#1a1a2e',
-    marginBottom: '5px',
-  },
-  total: {
-    textAlign: 'center',
-    color: '#666',
-    marginBottom: '20px',
-  },
-  voterCard: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '15px',
-    padding: '12px',
-    borderRadius: '6px',
-    backgroundColor: '#f0f2f5',
-    marginBottom: '10px',
-  },
-  index: {
-    backgroundColor: '#00d4ff',
-    color: 'white',
-    borderRadius: '50%',
-    width: '30px',
-    height: '30px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontWeight: 'bold',
-    fontSize: '14px',
-  },
-  name: {
-    fontSize: '16px',
-    fontWeight: '500',
-    color: '#1a1a2e',
-  },
-  empty: {
-    textAlign: 'center',
-    color: '#666',
-  }
 }
 
 export default Voters

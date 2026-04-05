@@ -1,40 +1,37 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
+import { useTheme } from './ThemeContext'
 
 function Navbar() {
+  const { theme, toggleTheme } = useTheme()
+  const location = useLocation()
+
+  const links = [
+    { to: '/', label: 'Dashboard' },
+    { to: '/register', label: 'Register' },
+    { to: '/verify', label: 'Verify' },
+    { to: '/voters', label: 'Voters' },
+  ]
+
   return (
-    <nav style={styles.nav}>
-      <h2 style={styles.logo}>AuthSync</h2>
-      <div style={styles.links}>
-        <Link to="/" style={styles.link}>Register</Link>
-        <Link to="/verify" style={styles.link}>Verify</Link>
-        <Link to="/voters" style={styles.link}>Voters</Link>
+    <nav className="navbar">
+      <span className="navbar-logo">AuthSync</span>
+      <div className="navbar-links">
+        {links.map(link => (
+          <Link
+            key={link.to}
+            to={link.to}
+            className={`navbar-link ${location.pathname === link.to ? 'active' : ''}`}
+          >
+            {link.label}
+          </Link>
+        ))}
+        <button className="theme-toggle" onClick={toggleTheme}>
+          {theme === 'light' ? '🌙' : '☀️'}
+        </button>
       </div>
     </nav>
   )
-}
-
-const styles = {
-  nav: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#1a1a2e',
-    padding: '15px 30px',
-  },
-  logo: {
-    color: '#00d4ff',
-    margin: 0,
-  },
-  links: {
-    display: 'flex',
-    gap: '20px',
-  },
-  link: {
-    color: 'white',
-    textDecoration: 'none',
-    fontSize: '16px',
-  }
 }
 
 export default Navbar
