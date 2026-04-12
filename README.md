@@ -1,70 +1,170 @@
-# Getting Started with Create React App
+# AuthSync — Face Recognition Authentication System
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack biometric authentication system that uses facial recognition to verify identities and prevent duplicate access. Built for use cases like voting booths, exam halls, office entry, and event ticketing.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## Demo
 
-### `npm start`
+> 🎥 Add your demo video link here
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Features
 
-### `npm test`
+- **Face Registration** — Register a person by capturing their face encoding
+- **Face Verification** — Verify identity in real-time using facial recognition
+- **Duplicate Prevention** — Automatically denies access if the same face is detected again
+- **Election Reset** — Clear all registered voters to start a fresh cycle
+- **Admin Dashboard** — Real-time stats, quick actions, and system status
+- **Dark Mode** — Full light/dark theme toggle
+- **REST API** — Clean FastAPI backend with auto-generated Swagger documentation
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
+## Tech Stack
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+**Backend**
+- Python
+- FastAPI
+- DeepFace (FaceNet model — 128-dim face embeddings)
+- OpenCV
+- SQLite
+- TensorFlow
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+**Frontend**
+- React
+- React Router
+- Axios
+- CSS Variables (light/dark theming)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+---
 
-### `npm run eject`
+## Architecture
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Project Structure
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+authsync/
+├── backend/
+│   ├── auth_sync.py        # Core authentication logic
+│   ├── face_detector.py    # Face detection and encoding (OpenCV + DeepFace)
+│   ├── db_handler.py       # Database operations (SQLite)
+│   ├── api.py              # FastAPI REST API
+│   ├── main.py             # Local testing entry point
+│   ├── database/           # SQLite database
+│   └── requirements.txt
+│
+├── frontend/
+│   ├── src/
+│   │   ├── App.js
+│   │   ├── Dashboard.js    # Stats, quick actions, election reset
+│   │   ├── Register.js     # Voter registration page
+│   │   ├── Verify.js       # Face verification page
+│   │   ├── Voters.js       # All registered voters
+│   │   ├── Navbar.js       # Navigation with theme toggle
+│   │   ├── ThemeContext.js # Dark/light mode context
+│   │   └── index.css       # Design system with CSS variables
+│   └── package.json
+│
+└── README.md
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+---
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## How It Works
 
-## Learn More
+1. **Registration** — User uploads a photo. DeepFace generates a 128-dimensional face embedding using the FaceNet model. This encoding is stored in SQLite.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+2. **Verification** — User uploads a photo. A new encoding is generated and compared against all stored encodings using Euclidean distance. If the distance is below 0.6, the face is considered a match and access is denied.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+3. **Reset** — Admin can clear all voter encodings to start a new election cycle.
 
-### Code Splitting
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Getting Started
 
-### Analyzing the Bundle Size
+### Backend Setup
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```bash
+# Clone the repo
+git clone https://github.com/YashThosar/authsync
+cd authsync/backend
 
-### Making a Progressive Web App
+# Create virtual environment
+python -m venv venv
+.\venv\Scripts\activate  # Windows
+source venv/bin/activate  # Mac/Linux
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+# Install dependencies
+pip install -r requirements.txt
 
-### Advanced Configuration
+# Start the API server
+uvicorn api:app --reload
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+API runs at `http://localhost:8000`
+Swagger docs at `http://localhost:8000/docs`
 
-### Deployment
+### Frontend Setup
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+```bash
+cd authsync/frontend
 
-### `npm run build` fails to minify
+# Install dependencies
+npm install
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+# Start React app
+npm start
+```
+
+Frontend runs at `http://localhost:3000`
+
+---
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | Health check |
+| POST | `/register` | Register a new voter with name + image |
+| POST | `/verify` | Verify if a face has already voted |
+| GET | `/voters` | Get all registered voters |
+| DELETE | `/clear-voters` | Clear all voters for new election cycle |
+
+---
+
+## Note on First Run
+
+DeepFace will automatically download the FaceNet model (~90MB) on first run. This only happens once and is saved to `~/.deepface/weights`.
+
+---
+
+## Common Setup Issues
+
+**venv activation fails on Windows**
+```bash
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+**Camera not working**
+The system supports static image uploads for environments without a webcam.
+
+---
+
+## Roadmap
+
+- [x] Phase 1 — Face detection, encoding, and matching
+- [x] Phase 2 — FastAPI backend with OOP architecture
+- [x] Phase 3 — React frontend with dark mode and dashboard
+- [ ] Phase 4 — PostgreSQL migration
+- [ ] Phase 5 — Deployment on Railway/Render
+- [ ] Phase 6 — Liveness detection (anti-spoofing)
+- [ ] Phase 7 — OTP verification layer
+
+---
+
+## Developer
+
+**Yash Thosar**
+Third Year IT Student — SPPU
+[GitHub](https://github.com/YashThosar)
