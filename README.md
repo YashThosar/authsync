@@ -4,11 +4,7 @@ A full-stack biometric authentication system that uses facial recognition to ver
 
 ---
 
-## Demo
 
-> 🎥 Add your demo video link here
-
----
 
 ## Features
 
